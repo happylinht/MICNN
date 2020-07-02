@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+"""
+This program is used to prepare the training data sets and test set for MICNN. 
+Simple oversampling is used to balance the pulsars and non-pulsars in the training set.
+"""
 # In[22]:
 
 
