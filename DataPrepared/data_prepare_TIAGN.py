@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+"""
+This program is used to prepare the training data sets and test set for MICNN. 
+TIAGN algorithm is used to balance the pulsars and non-pulsars in the training set.
+"""
 # In[22]:
 
 
@@ -12,7 +15,6 @@ from sklearn.preprocessing import scale
 
 
 # In[2]:
-
 
 path = '/home/DM11/Four_plots_HTRU.pkl'
 
@@ -102,11 +104,11 @@ def pulsar_noise(signal):
     signal_new = np.random.rand(len(signal))*0.5+signal 
     return signal_new
 
-def TIANG_int(data_1,data_2,label,sample_rate=3):     
+def TIANG_int(data_1,data_2,label,imbalance_rate):     
     id_pulsar=np.where(label==1)[0]
     id_non_pulsar=np.where(label==0)[0]
-    sample_rate =  len(id_non_pulsar)/len(id_pulsar)/sample_rate
-    pulsar_num = int(sample_rate*len(id_pulsar)) #重抽样抽出pulsar的数量
+    imbalance_rate =  len(id_non_pulsar)/len(id_pulsar)/imbalance_rate
+    pulsar_num = int(imbalance_rate*len(id_pulsar)) # the number of samples for pulsar signals
     np.random.seed(123)
     id_sample_pulsar=id_pulsar[np.random.randint(0,len(id_pulsar),pulsar_num)]
     
@@ -126,20 +128,19 @@ def TIANG_int(data_1,data_2,label,sample_rate=3):
 
 
 
-X_int_train_1_5,X_int_train_2_5, y_train_5= TIANG_int(X_int_train_1,X_int_train_2, y_train,sample_rate=5)  # 设置TIANG重采样率
-X_int_train_1_20,X_int_train_2_20, y_train_20= TIANG_int(X_int_train_1,X_int_train_2, y_train,sample_rate=20)  # 设置TIANG重采样率
+X_int_train_1_5,X_int_train_2_5, y_train_5= TIANG_int(X_int_train_1,X_int_train_2, y_train,imbalance_rate=5)  # the imbalance rate is 5:1
+X_int_train_1_20,X_int_train_2_20, y_train_20= TIANG_int(X_int_train_1,X_int_train_2, y_train,imbalance_rate=20)  # the imbalance rate is 20:1
 
 
 # In[148]:
 
+np.save("X_int_train_1_5.npy",X_int_train_1_5)
+np.save("X_int_train_2_5.npy",X_int_train_2_5)
+np.save("y_train_5.npy",y_train_5)
 
 np.save("X_int_train_1_20.npy",X_int_train_1_20)
 np.save("X_int_train_2_20.npy",X_int_train_2_20)
 np.save("y_train_20.npy",y_train_20)
-
-np.save("X_int_train_1_5.npy",X_int_train_1_5)
-np.save("X_int_train_2_5.npy",X_int_train_2_5)
-np.save("y_train_5.npy",y_train_5)
 
 np.save("X_int_train_1_75.npy",X_int_train_1)
 np.save("X_int_train_2_75.npy",X_int_train_2)
