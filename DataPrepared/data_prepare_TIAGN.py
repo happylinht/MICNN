@@ -16,13 +16,13 @@ from sklearn.preprocessing import scale
 
 # In[2]:
 
-path = '/home/DM11/Four_plots_HTRU.pkl'
+path = '/home/DM11/Four_plots_HTRU.pkl'  # The folder where your files are saved
 
 
 # In[3]:
 
 
-data = pickle.load(open(path,'rb'),encoding='latin1')  # import the four 
+data = pickle.load(open(path,'rb'))  # import the four 
 
 
 # In[4]:
@@ -80,9 +80,14 @@ Feature_2 = scale(Feature_2,axis=0)
 
 from sklearn.model_selection import train_test_split
 np.random.seed(123)
-X_int_train_1, X_int_test_1, y_train, y_test = train_test_split(X_subint,y,test_size=0.25)
+X_int_1, X_int_test_1, y_, y_test = train_test_split(X_subint,y,test_size=0.25)
 np.random.seed(123)
-X_int_train_2, X_int_test_2, y_train, y_test = train_test_split(Feature_2,y,test_size=0.25)
+X_int_2, X_int_test_2, y_, y_test = train_test_split(Feature_2,y,test_size=0.25)
+
+np.random.seed(123)
+X_int_train_1, X_int_val_1, y_train, y_val = train_test_split(X_int_1,y_,test_size=0.20)
+np.random.seed(123)
+X_int_train_2, X_int_val_2, y_train, y_val = train_test_split(X_int_2,y_,test_size=0.20)
 
 
 # In[145]:
@@ -101,7 +106,7 @@ def pulsar_transform_int(signal):  #平移
     return signal_new
 
 def pulsar_noise(signal):
-    signal_new = np.random.rand(len(signal))*0.5+signal 
+    signal_new = np.random.rand(len(signal))*0.2+signal 
     return signal_new
 
 def TIANG_int(data_1,data_2,label,imbalance_rate):     
@@ -145,6 +150,10 @@ np.save("y_train_20.npy",y_train_20)
 np.save("X_int_train_1_75.npy",X_int_train_1)
 np.save("X_int_train_2_75.npy",X_int_train_2)
 np.save("y_train_75.npy",y_train)
+
+np.save("X_int_val_1.npy",X_int_val_1)
+np.save("X_int_val_2.npy",X_int_val_2)
+np.save("y_val.npy",y_val)
 
 np.save("X_int_test_1.npy",X_int_test_1)
 np.save("X_int_test_2.npy",X_int_test_2)
