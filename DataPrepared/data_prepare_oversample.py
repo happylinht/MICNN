@@ -23,7 +23,7 @@ path = '/home/DM11/Four_plots_HTRU.pkl'
 # In[3]:
 
 
-data = pickle.load(open(path,'rb'),encoding='latin1')  # import the four 
+data = pickle.load(open(path,'rb'))  # The folder where your files are saved 
 
 
 # In[4]:
@@ -81,9 +81,14 @@ Feature_2 = scale(Feature_2,axis=0)
 
 from sklearn.model_selection import train_test_split
 np.random.seed(123)
-X_int_train_1, X_int_test_1, y_train, y_test = train_test_split(X_subint,y,test_size=0.25)
+X_int_1, X_int_test_1, y_, y_test = train_test_split(X_subint,y,test_size=0.25)
 np.random.seed(123)
-X_int_train_2, X_int_test_2, y_train, y_test = train_test_split(Feature_2,y,test_size=0.25)
+X_int_2, X_int_test_2, y_, y_test = train_test_split(Feature_2,y,test_size=0.25)
+
+np.random.seed(123)
+X_int_train_1, X_int_val_1, y_train, y_val = train_test_split(X_int_1,y_,test_size=0.20)
+np.random.seed(123)
+X_int_train_2, X_int_val_2, y_train, y_val = train_test_split(X_int_2,y_,test_size=0.20)
 
 
 # In[145]:
@@ -149,10 +154,9 @@ np.save("X_int_train_1_75r.npy",X_int_train_1)
 np.save("X_int_train_2_75r.npy",X_int_train_2)
 np.save("y_train_75r.npy",y_train)
 
-#np.save("X_int_test_1.npy",X_int_test_1)
-#np.save("X_int_test_2.npy",X_int_test_2)
-#np.save("y_test.npy",y_test)
-
+np.save("X_int_val_1r.npy",X_int_val_1)
+np.save("X_int_val_2r.npy",X_int_val_2)
+np.save("y_valr.npy",y_val)
 
 # In[ ]:
 
