@@ -32,6 +32,9 @@ y_train=np.load("y_train_75.npy")
 X_int_test_1=np.load("X_int_test_1.npy")
 y_test=np.load("y_test.npy")
 
+X_int_val_1=np.load("X_int_val_1.npy")
+y_val=np.load("y_val.npy")
+
 
 # In[3]:
 
@@ -75,12 +78,12 @@ model.compile(optimizer = Adam(lr = 5e-6), loss = 'binary_crossentropy', metrics
 # In[4]:
 
 
-def model_fit(model,x_train_1,y_train,x_test_1,y_test,epoch=50):
+def model_fit(model,x_train_1,y_train,x_val_1,y_val,epoch=50):
     result_all=[]
     x_train_1 = x_train_1.reshape(-1,16,64,1)
-    x_test_1 = x_test_1.reshape(-1,16,64,1)
+    x_val_1 = x_val_1.reshape(-1,16,64,1)
     y_train = to_categorical(y_train)
-    y_test = to_categorical(y_test)
+    y_val = to_categorical(y_val
     for i in range(epoch):
         result = model.fit(x_train_1, y_train,
               batch_size=150,
@@ -88,13 +91,13 @@ def model_fit(model,x_train_1,y_train,x_test_1,y_test,epoch=50):
               shuffle=True
                       )
 
-        y_pro = model.predict(x_test_1)
+        y_pro = model.predict(x_val_1)
         y_pred = np.argmax(y_pro,axis=1)
-        y_test_ = np.argmax(y_test,axis=1) 
-        accuracy_int=sum(y_test_==y_pred)/len(y_test_)
-        recall_int = recall_score(y_test_,y_pred)
-        precision_int = precision_score(y_test_,y_pred)
-        confusion_int = confusion_matrix(y_test_,y_pred)    
+        y_val_ = np.argmax(y_val,axis=1) 
+        accuracy_int=sum(y_val_==y_pred)/len(y_val_)
+        recall_int = recall_score(y_val_,y_pred)
+        precision_int = precision_score(y_val_,y_pred)
+        confusion_int = confusion_matrix(y_val_,y_pred)    
         [tn, fp], [fn, tp] = confusion_int
     #     print("FPR_int:",fp/(fp+tn))
         result_all.append([result.history['loss'][0],result.history['accuracy'][0],accuracy_int,recall_int,precision_int,fp/(fp+tn)])
@@ -105,9 +108,9 @@ def model_fit(model,x_train_1,y_train,x_test_1,y_test,epoch=50):
 
 
 def model_train(model):
-    model,result_1 = model_fit(model,X_int_train_1_5,y_train_5,X_int_test_1,y_test,epoch=100)
-    model,result_2 = model_fit(model,X_int_train_1_20,y_train_20,X_int_test_1,y_test,epoch=100)
-    model,result_3 =model_fit(model,X_int_train_1,y_train,X_int_test_1,y_test,epoch=100)
+    model,result_1 = model_fit(model,X_int_train_1_5,y_train_5,X_int_val_1,y_val,epoch=100)
+    model,result_2 = model_fit(model,X_int_train_1_20,y_train_20,X_int_val_1,y_val,epoch=100)
+    model,result_3 =model_fit(model,X_int_train_1,y_train,X_int_val_1,y_val,epoch=100)
     result = np.vstack([np.array(result_1),np.array(result_2),np.array(result_3)])
     return model,result
 
