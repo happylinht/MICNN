@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""
-This program is used to extract four diagnostic plots of pulsar candidates on the HTRU data.
-Before extracting the diagnostic plots (sub-integrations, sub-bands, folded profile, and DM curve) from the HTRU data,
-please download HTRU data which is public by Morello (2014).
-"""
+
 # In[1]:
 
 
@@ -36,6 +32,9 @@ def readDataBlock(xmlnode):
         dtype = float
         )
     
+#     vmin = float(xmlnode.get('min'))
+#     vmax = float(xmlnode.get('max'))
+#     return data * (vmax - vmin) / 255. + vmin
     return data
 
 
@@ -88,17 +87,26 @@ def downsample(a, n, align=0):
             m = len(a)
             x = mgrid[0:1-1./m:1j*m]
             if align:
+                #ensure new grid lands on max(a)
                 coords += x[align]
                 coords = coords % 1
                 coords.sort()
-
+            #newf = interp(x, a, bounds_error=True)
+            #return newf(coords)
             return np.interp(coords, x, a)
         elif D == 2:
-
+            #k,l = a.shape
+            #x = mgrid[0:1:1j*k]
+            #y = mgrid[0:1:1j*l]
+            #f = interp2d(x, y, a)
+            #coords = mgrid[0:1:1j*n]
+            #return f(coords, coords)
             newf = ndimage.map_coordinates(a, coords, cval=np.median(a))
             return newf
         else:
+            #coeffs = ndimage.spline_filter(a)
             newf = ndimage.map_coordinates(coeffs, coords, prefilter=False)
+            #newf = ndimage.map_coordinates(coeffs, coords )
             return newf
 
 
@@ -151,12 +159,22 @@ class Candidate(object):
             subints = subints[-16:, :64]
             subints /= 255.
 
+#             sed = np.mean(subints, axis=1)
+#             valid_index = np.where(sed > 0)
+#             self.missed_ratio_time_vs_phase = 1. - len(valid_index) * 1.0 / len(sed)
+#             if self.missed_ratio_time_vs_phase < 0.8:
+#                 subints = subints[valid_index]
+#             else:
+#                 self.missed_ratio_time_vs_phase = 0.
             if (M is not None) and (subints.shape[0] != M):
                 subints = downsample(subints, [M, 64], self.align)
 
+#             subints = greyscale(subints)
+
             return subints
 
-        ### Sub-bands
+
+        ### Sub-Bands
         def subbands_fig(M):
             subbandsNode = self.opt_section.find('SubBands')
             nsubs = int(subbandsNode.get('nSub'))
@@ -165,12 +183,21 @@ class Candidate(object):
             subbands = subbands[-16:, :64]
             subbands /= 255.
 
+#             sed = subbands.mean(axis=1)
+#             valid_index = np.where(sed > 0)[0]
+#             self.missed_ratio_subbands = 1. - len(valid_index) * 1.0 / len(sed)
+#             if self.missed_ratio_subbands < 0.8:
+#                 subbands = subbands[valid_index]
+#             else:
+#                 self.missed_ratio_subbands = 0.
             if (M is not None) and (subbands.shape[0] != M):
                 subbands = downsample(subbands, [M, 64], self.align)
 
+#             subbands = greyscale(subbands)
+
             return subbands
 
-        ### the Folded Profile
+        ### Profile
         def profile_curve(M):
 
             if (M is not None) and (len(self.profile) != M):
@@ -185,7 +212,7 @@ class Candidate(object):
 
             return profile
 
-        ### DmCurve
+        ### DmCurve: FFT S/N vs. PEASOUP Trial DM, at best candidate acceleration
         def DM_curve(M):
             dmcurve_node = self.fft_section.find('DmCurve')
             text = dmcurve_node.find('SnrValues').text
@@ -211,8 +238,8 @@ class Candidate(object):
 # In[5]:
 
 
-pulsar_flist = glob('../HTRU/pulsars/*.phcx')
-rfi_flist = glob('../HTRU/negatives/RFI/*phcx')
+pulsar_flist = glob('../pulsar & RFI/HTRU 1/pulsars/*.phcx')
+rfi_flist = glob('../pulsar & RFI/HTRU 1/negatives/RFI/*phcx')
 
 
 # In[6]:
@@ -233,6 +260,9 @@ for f in pulsar_flist:
     
 print('pulsar finished')
     
+# random_index = np.random.permutation(len(rfi_flist))
+# valid_index = random_index[:20000]
+# for f in np.array(rfi_flist)[valid_index]:
 for f in rfi_flist:
     p = Candidate(f)
     rfi_list.append(p.getdata())
@@ -269,3 +299,7 @@ pickle.dump(data, open('HTRU_for_FAST.pkl', 'wb'))
 
 
 # In[ ]:
+
+
+
+
